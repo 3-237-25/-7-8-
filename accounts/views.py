@@ -1,4 +1,6 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import User
+from django.db.models import Count
 from django.shortcuts import (
     get_object_or_404,
     redirect,
@@ -8,6 +10,7 @@ from .models import (
     AcademicGroup,
     Course,
     Department,
+    StudentProfile,
 )
 from .forms import (
     AcademicGroupForm,
@@ -312,4 +315,211 @@ def course_delete(request, pk):
             'title': 'Удаление курса',
         }
     )
+@login_required
+def dashboard(request):
+    departments = Department.objects.all()
+    department_id = request.GET.get('department')
 
+    courses = Course.objects.all()
+    groups = AcademicGroup.objects.all()
+    students = StudentProfile.objects.filter(department__isnull=False)
+
+    if department_id:
+        courses = courses.filter(department_id=department_id)
+        groups = groups.filter(department_id=department_id)
+        students = students.filter(department_id=department_id)
+
+    departments_count = (
+        departments.filter(id=department_id).count()
+        if department_id
+        else departments.count()
+    )
+
+    courses_count = courses.count()
+    groups_count = groups.count()
+    users_count = User.objects.count()
+
+    courses_by_department = list(
+        courses
+        .values('department__name')
+        .annotate(total=Count('id'))
+    )
+
+    groups_by_department = list(
+        groups
+        .values('department__name')
+        .annotate(total=Count('id'))
+    )
+
+    students_by_department = list(
+        students
+        .values('department__name')
+        .annotate(total=Count('id'))
+    )
+
+    students_by_group = list(
+        students
+        .filter(academic_group__isnull=False)
+        .values('academic_group__name')
+        .annotate(total=Count('id'))
+    )
+
+    return render(
+        request,
+        'dashboard.html',
+        context={
+            'departments_count': departments_count,
+            'courses_count': courses_count,
+            'groups_count': groups_count,
+            'users_count': users_count,
+
+            'courses_by_department': courses_by_department,
+            'groups_by_department': groups_by_department,
+            'students_by_department': students_by_department,
+            'students_by_group': students_by_group,
+
+            'departments': departments,
+            'selected_department': department_id,
+        }
+    )
+
+@login_required
+def courses_dashboard(request):
+    departments = Department.objects.all()
+    department_id = request.GET.get('department')
+
+    courses = Course.objects.all()
+
+    if department_id:
+        courses = courses.filter(department_id=department_id)
+
+    students_by_course = list(
+        courses
+        .values('title')
+        .annotate(total=Count('students'))
+    )
+
+    return render(
+        request,
+        'courses_dashboard.html',
+        context={
+            'students_by_course': students_by_course,
+            'departments': departments,
+            'selected_department': department_id,
+        }
+    )
+
+@login_required
+def groups_dashboard(request):
+    departments = Department.objects.all()
+    department_id = request.GET.get('department')
+
+    groups = AcademicGroup.objects.all()
+    students = StudentProfile.objects.filter(
+        academic_group__isnull=False
+    )
+
+    if department_id:
+        groups = groups.filter(department_id=department_id)
+        students = students.filter(department_id=department_id)
+
+    groups_by_department = list(
+        groups
+        .values('department__name')
+        .annotate(total=Count('id'))
+    )
+
+    students_by_department = list(
+        students
+        .filter(department__isnull=False)
+        .values('department__name')
+        .annotate(total=Count('id'))
+    )
+
+    students_by_group = list(
+        students
+        .values('academic_group__name')
+        .annotate(total=Count('id'))
+    )
+
+    return render(
+        request,
+        'groups_dashboard.html',
+        context={
+            'groups_by_department': groups_by_department,
+            'students_by_department': students_by_department,
+            'students_by_group': students_by_group,
+            'departments': departments,
+            'selected_department': department_id,
+        }
+    )
+
+@login_required
+def departments_dashboard(request):
+    departments = Department.objects.all()
+    department_id = request.GET.get('department')
+
+    courses = Course.objects.all()
+    students = StudentProfile.objects.filter(
+        department__isnull=False
+    )
+
+    if department_id:
+        courses = courses.filter(department_id=department_id)
+        students = students.filter(department_id=department_id)
+
+    students_by_department = list(
+        students
+        .values('department__name')
+        .annotate(total=Count('id'))
+    )
+
+    courses_by_department = list(
+        courses
+        .values('department__name')
+        .annotate(total=Count('id'))
+    )
+
+    return render(
+        request,
+        'departments_dashboard.html',
+        context={
+            'students_by_department': students_by_department,
+            'courses_by_department': courses_by_department,
+            'departments': departments,
+            'selected_department': department_id,
+        }
+    )
+
+@login_required
+def summary_dashboard(request):
+    departments = Department.objects.all()
+    department_id = request.GET.get('department')
+
+    courses = Course.objects.all()
+
+    if department_id:
+        courses = courses.filter(department_id=department_id)
+
+    courses_by_department = list(
+        courses
+        .values('department__name')
+        .annotate(total=Count('id'))
+    )
+
+    students_by_course = list(
+        courses
+        .values('title')
+        .annotate(total=Count('students'))
+    )
+
+    return render(
+        request,
+        'summary_dashboard.html',
+        context={
+            'courses_by_department': courses_by_department,
+            'students_by_course': students_by_course,
+            'departments': departments,
+            'selected_department': department_id,
+        }
+    )

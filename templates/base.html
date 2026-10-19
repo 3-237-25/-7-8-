@@ -33,7 +33,16 @@
             DjangoApp
         </a>
 
-        <div class="navbar-nav me-auto">
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <div class="navbar-nav me-auto">
+
 
             <a class="nav-link"
    href="/profile/">
@@ -55,29 +64,50 @@
     Курсы
 </a>
 
+<a class="nav-link" href="/dashboard/">
+    Дашборд
+</a>
+
+<a class="nav-link" href="/courses-dashboard/">
+    Дашборд 2
+</a>
+
+<a class="nav-link" href="/groups-dashboard/">
+    Дашборд 3
+</a>
+
+<a class="nav-link" href="/departments-dashboard/">
+    Дашборд 4
+</a>
+
+<a class="nav-link" href="/summary-dashboard/">
+    Дашборд 5
+</a>
         </div>
 
         {% if user.is_authenticated %}
 
-        <span class="navbar-text me-3">
-            {{ user.username }}
-        </span>
+    <span class="navbar-text me-3">
+        {{ user.username }}
+    </span>
 
-        <form method="post"
-              action="/accounts/logout/">
+    <form method="post"
+          action="/accounts/logout/">
 
-            {% csrf_token %}
+        {% csrf_token %}
 
-            <button class="btn btn-outline-light btn-sm"
-                    type="submit">
-                Выйти
-            </button>
+        <button class="btn btn-outline-light btn-sm"
+                type="submit">
+            Выйти
+        </button>
 
-        </form>
+    </form>
 
-        {% endif %}
+{% endif %}
 
-    </div>
+</div>
+
+</div>
 </nav>
 
 <div class="container page-container">

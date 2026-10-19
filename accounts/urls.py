@@ -67,4 +67,29 @@ path(
         views.academic_group_delete,
         name='academic_group_delete'
     ),
+    path(
+        'dashboard/',
+        views.dashboard,
+        name='dashboard'
+),
+path(
+    'courses-dashboard/',
+    views.courses_dashboard,
+    name='courses_dashboard'
+),
+path(
+    'groups-dashboard/',
+    views.groups_dashboard,
+    name='groups_dashboard'
+),
+path(
+    'departments-dashboard/',
+    views.departments_dashboard,
+    name='departments_dashboard'
+),
+path(
+    'summary-dashboard/',
+    views.summary_dashboard,
+    name='summary_dashboard'
+),
 ]
