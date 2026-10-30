@@ -30,15 +30,6 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
-'django.contrib.admin',
- 'django.contrib.auth',
- 'django.contrib.contenttypes',
- 'django.contrib.sessions',
- 'django.contrib.messages',
- 'django.contrib.staticfiles',
- 'accounts',
-]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -148,6 +139,7 @@ INSTALLED_APPS = [
     "accounts",
     "rest_framework",
     "tickets",
+    "bookings"
 ]
 
 REST_FRAMEWORK = {

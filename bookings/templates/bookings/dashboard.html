@@ -1,0 +1,74 @@
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Бронирование ресурсов</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css">
+    <style>
+        body { background-color: #f4f6fa; }
+        .card { border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .btn-primary { background-color: #6f42c1; border-color: #6f42c1; }
+        .status-created { background-color: #e7f5ff; color: #1c7ed6; }
+        .status-approved { background-color: #d3f9d8; color: #2f9e44; }
+        .status-completed { background-color: #e9ecef; color: #495057; }
+        .status-rejected { background-color: #ffe3e3; color: #c92a2a; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="page-wrapper">
+        <div class="container-xl py-4">
+            <h1 class="mb-4">Система бронирования переговорных комнат</h1>
+            {% csrf_token %}
+            <div id="message" role="status" aria-live="polite"></div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">Новое бронирование</h3>
+                    <form id="booking-form">
+                        <div class="mb-3">
+                            <label class="form-label">Цель бронирования</label>
+                            <input id="purpose" class="form-control" required placeholder="Минимум 10 символов">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Комната</label>
+                            <select id="room" class="form-select" required></select>
+                        </div>
+                        <button class="btn btn-primary" type="submit">Создать бронь</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Мои бронирования</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <select id="status-filter" class="form-select">
+                                <option value="">Все статусы</option>
+                                <option value="created">Создана</option>
+                                <option value="approved">Подтверждена</option>
+                                <option value="completed">Завершена</option>
+                                <option value="rejected">Отклонена</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <select id="room-filter" class="form-select">
+                                <option value="">Все комнаты</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="loading" hidden class="text-center py-3">Загрузка данных...</div>
+                    <div id="bookings-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js"></script>
+<script src="{% static 'bookings/app.js' %}"></script>
+</body>
+</html>
