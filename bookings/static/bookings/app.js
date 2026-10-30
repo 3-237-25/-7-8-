@@ -77,14 +77,16 @@ async function loadBookings() {
             const row = document.createElement("div");
             row.className = "card mb-2 p-3";
 
-            let actions = "";
+            let actions = `
+                <button class="btn btn-sm btn-warning mb-1" onclick="editBooking(${booking.id}, '${booking.purpose.replace(/'/g, "\\'")}')">Редактировать</button>
+            `;
             if (booking.status === "created") {
-                actions = `
+                actions += `
                     <button class="btn btn-sm btn-success" onclick="changeStatus(${booking.id}, 'approve')">Подтвердить</button>
                     <button class="btn btn-sm btn-danger" onclick="changeStatus(${booking.id}, 'reject')">Отклонить</button>
                 `;
             } else if (booking.status === "approved") {
-                actions = `<button class="btn btn-sm btn-primary" onclick="changeStatus(${booking.id}, 'complete')">Завершить</button>`;
+                actions += `<button class="btn btn-sm btn-primary" onclick="changeStatus(${booking.id}, 'complete')">Завершить</button>`;
             }
 
             let historyHtml = "";
@@ -115,6 +117,22 @@ async function loadBookings() {
         showMessage("Ошибка загрузки: " + error.message, true);
     } finally {
         loading.hidden = true;
+    }
+}
+
+async function editBooking(id, currentPurpose) {
+    const newPurpose = prompt("Введите новую цель бронирования:", currentPurpose);
+    if (newPurpose === null || newPurpose.trim() === currentPurpose) return;
+
+    try {
+        await apiRequest(`/bookings/api/bookings/${id}/`, {
+            method: "PATCH",
+            body: JSON.stringify({ purpose: newPurpose })
+        });
+        showMessage("Цель бронирования обновлена");
+        await loadBookings();
+    } catch (error) {
+        showMessage("Ошибка редактирования: " + error.message, true);
     }
 }
 

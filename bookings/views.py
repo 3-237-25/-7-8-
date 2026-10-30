@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db import transaction
 from .models import Room, Booking, BookingHistory
-from .serializers import RoomSerializer, BookingSerializer
+from .serializers import RoomSerializer, BookingSerializer, BookingHistorySerializer
 from rest_framework import serializers
 
 
@@ -26,6 +26,13 @@ class RoomViewSet(viewsets.ReadOnlyModelViewSet):
 class BookingViewSet(viewsets.ModelViewSet):
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
+
+    @action(detail=True, methods=['get'])
+    def history(self, request, pk=None):
+        booking = self.get_object()
+        history = booking.history.all().order_by('-timestamp')
+        serializer = BookingHistorySerializer(history, many=True)
+        return Response(serializer.data)
 
     def get_queryset(self):
         return Booking.objects.filter(owner=self.request.user).select_related('room').prefetch_related(
